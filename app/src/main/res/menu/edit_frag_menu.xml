@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="HardcodedText">
+    <item
+        android:id="@+id/save_memo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/baseline_memo_save_72"
+        android:title="保存"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/record_audio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/baseline_audio_mic_72"
+        android:title="录制音频"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/choose_audio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/baseline_audio_file_72"
+        android:title="选择音频文件"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/audio_to_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/baseline_audio_text_72"
+        android:title="音频转文字" />
+    <item
+        android:id="@+id/memo_history"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:icon="@drawable/baseline_memo_history_72"
+        android:title="历史" />
+    <item
+        android:id="@+id/test_edit_menu_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="测试菜单1" />
+    <item
+        android:id="@+id/test_edit_menu_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:title="测试菜单2"
+        app:actionViewClass="android.widget.Button"
+        />
+</menu>

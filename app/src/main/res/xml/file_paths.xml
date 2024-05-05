@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:tools="http://schemas.android.com/tools">
+    <external-path
+        name="my_images"
+        path="/" />
+    <external-path
+        name="my_audios"
+        path="/" />
+    <external-cache-path
+        name="cached_audios"
+        path="/"/>
+</paths>

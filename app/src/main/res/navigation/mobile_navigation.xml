@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_list">
+
+    <fragment
+        android:id="@+id/navigation_list"
+        android:name="com.illidancstormrage.cstormmemo.ui.list.ListFragment"
+        android:label="@string/title_list"
+        tools:layout="@layout/fragment_list"
+        >
+        <action
+            android:id="@+id/jump_to_edit"
+            app:destination="@id/navigation_edit"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_edit"
+        android:name="com.illidancstormrage.cstormmemo.ui.editor.EditorFragment"
+        android:label="@string/title_add"
+        tools:layout="@layout/fragment_editor" >
+        <argument
+            android:name="memoId"
+            app:argType="long"
+            android:defaultValue="0L" />
+        <action
+            android:id="@+id/jump_to_list"
+            app:destination="@id/navigation_list" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_search"
+        android:name="com.illidancstormrage.cstormmemo.ui.search.SearchFragment"
+        android:label="@string/title_search"
+        tools:layout="@layout/fragment_search" />
+</navigation>

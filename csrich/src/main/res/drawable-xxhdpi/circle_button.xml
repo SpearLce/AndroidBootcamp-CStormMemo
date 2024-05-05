@@ -1,0 +1,6 @@
+<!-- res/drawable/circle_button.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="ring">
+    <solid android:color="@color/design_default_color_primary"/> <!-- 指定按钮填充颜色 -->
+    <stroke android:width="1dp" android:color="@color/design_default_color_error"/> <!-- 可选：添加边框 -->
+</shape>

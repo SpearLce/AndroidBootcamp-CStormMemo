@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">CStormMemo</string>
+    <string name="title_list">笔记</string>
+    <string name="title_add">编辑</string>
+    <string name="title_search">搜索</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string-array name="example_items">
+        <item>选项1</item>
+        <item>选项2</item>
+        <item>选项3</item>
+    </string-array>
+</resources>

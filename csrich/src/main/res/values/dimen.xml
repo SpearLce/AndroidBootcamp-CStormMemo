@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="toolItem_width_large">26dp</dimen>
+    <dimen name="toolItem_width_mid">22dp</dimen>
+    <dimen name="toolItem_width_small">20dp</dimen>
+    <dimen name="toolItem_width_custom">22dp</dimen>
+
+
+</resources>
