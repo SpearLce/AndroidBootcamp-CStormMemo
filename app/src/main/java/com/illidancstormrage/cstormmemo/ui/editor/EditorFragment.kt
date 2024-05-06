@@ -2,7 +2,10 @@ package com.illidancstormrage.cstormmemo.ui.editor
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
+import android.app.DatePickerDialog
 import android.content.Intent
+import android.icu.util.Calendar
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,6 +16,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.FileProvider
 import androidx.core.view.MenuProvider
@@ -20,29 +27,28 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.LegacyPlayerControlView
 import androidx.navigation.fragment.navArgs
 import cn.hutool.core.date.DateUtil
+import com.google.android.material.textfield.TextInputEditText
+import com.hjq.permissions.XXPermissions
 import com.illidancstormrage.csrich.toolitem.CSToolImage
 import com.illidancstormrage.cstormmemo.R
 import com.illidancstormrage.cstormmemo.databinding.FragmentEditorBinding
-import com.illidancstormrage.cstormmemo.model.history.History
 import com.illidancstormrage.cstormmemo.model.memo.MemoRecord
-import com.illidancstormrage.cstormmemo.repository.LocalRepository
 import com.illidancstormrage.cstormmemo.ui.SharedViewModel
 import com.illidancstormrage.cstormmemo.ui.editor.dialog.HistoryDialogFragment
 import com.illidancstormrage.cstormmemo.ui.record.AudioRecordActivity
+import com.illidancstormrage.cstormmemo.utils.calendar.CalendarUtil.addEventToCalendar
 import com.illidancstormrage.cstormmemo.utils.extensions.pass
+import com.illidancstormrage.cstormmemo.utils.extensions.requestReadCalendar
+import com.illidancstormrage.cstormmemo.utils.extensions.requestWriteCalendar
 import com.illidancstormrage.cstormmemo.utils.file.FileUtil
-import com.illidancstormrage.utils.database.room.condition.QueryWrapper
 import com.illidancstormrage.utils.log.LogUtil
 import com.illidancstormrage.utils.toast.makeToast
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 
 
@@ -181,28 +187,130 @@ class EditorFragment : Fragment() {
                                 val memoRecord = prepareMemoRecord()
                                 memoRecord.lastEditTimeStamp = selectedHistory.editTime
                                 memoRecord.id = editorViewModel.memoRecord.value!!.id
-                                editorViewModel.saveMemo(memoRecord,true)
+                                editorViewModel.saveMemo(memoRecord, true)
                             }
                             dialog.show(childFragmentManager, "history_dialog")
-                        }else{
+                        } else {
                             "第一次编辑文本，没有历史".makeToast()
                         }
 
                     }
 
                     R.id.test_edit_menu_1 -> {
-                        "test_edit_menu_1 菜单".makeToast()
 
-                        lifecycleScope.launch {
-                            launch(Dispatchers.IO) {
+                        val builder = AlertDialog.Builder(requireContext())
+                        builder.setTitle("添加提醒")
+                        // 1
+                        val editTextTitle = TextInputEditText(requireContext())
+                        editTextTitle.hint = "标题"
+                        editTextTitle.text = binding.title.text
+                        // 2
+                        val editTextDescription = TextInputEditText(requireContext())
+                        editTextDescription.hint = "描述"
 
-                                //val id = LocalRepository.getAudioIdByUri(uri = "不存在的uri")
-                                val queryWrapper = QueryWrapper().eq("uri", "file://")
-                                val id = LocalRepository.audioDao.selectOne(queryWrapper)
-                                LogUtil.e("test", "返回的 id ：$id") //null
-
-                            }
+                        // 3
+                        // 添加Spinner
+                        var minutesBefore: Int = 0
+                        val timeOptions = resources.getStringArray(R.array.time_options)
+                        val spinner = Spinner(requireContext())
+                        ArrayAdapter(
+                            requireContext(),
+                            android.R.layout.simple_spinner_item,
+                            timeOptions
+                        ).also { adapter ->
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                            spinner.adapter = adapter
                         }
+                        // 设置Spinner的选中监听器
+                        spinner.onItemSelectedListener =
+                            object : AdapterView.OnItemSelectedListener {
+                                override fun onItemSelected(
+                                    parent: AdapterView<*>,
+                                    view: View?,
+                                    position: Int,
+                                    id: Long
+                                ) {
+                                    // 这里可以根据position获取选中的时间提前量，并转换为Calendar对象
+                                    // 注意：此处需实现逻辑将选项转换为具体时间间隔，然后应用到Calendar对象
+                                    minutesBefore = when (timeOptions[position]) {
+                                        "准时" -> 0
+                                        "5分钟前" -> 5
+                                        "15分钟前" -> 15
+                                        "30分钟前" -> 30
+                                        "1小时前" -> 60
+                                        "3小时前" -> 180
+                                        "5小时前" -> 300
+                                        "12小时前" -> 720
+                                        "1天前" -> 1440
+                                        else -> 0
+                                    }
+                                }
+
+                                override fun onNothingSelected(parent: AdapterView<*>) {
+                                    minutesBefore = 0
+                                }
+                            }
+
+                        // 4. 添加日期选择按钮
+                        val datePickerButtonStart = Button(requireContext())
+                        datePickerButtonStart.text = "开始日期"
+                        datePickerButtonStart.setOnClickListener {
+                            showDatePickerDialog(1)
+                        }
+                        val datePickerButtonEnd = Button(requireContext())
+                        datePickerButtonEnd.text = "结束日期"
+                        datePickerButtonEnd.setOnClickListener {
+                            showDatePickerDialog(2)
+                        }
+
+                        editorViewModel.startCalendar.observe(viewLifecycleOwner) {
+                            datePickerButtonStart.text = it.time.toString()
+                        }
+                        editorViewModel.endCalendar.observe(viewLifecycleOwner) {
+                            datePickerButtonEnd.text = it.time.toString()
+                        }
+
+                        val linearLayout = LinearLayout(this@EditorFragment.requireContext())
+                        linearLayout.orientation = LinearLayout.VERTICAL
+                        linearLayout.addView(editTextTitle)
+                        linearLayout.addView(editTextDescription)
+                        //开始时间
+                        linearLayout.addView(TextView(requireContext()).also {
+                            it.text = "开始时间"
+                        })
+                        linearLayout.addView(datePickerButtonStart)
+                        //结束时间
+                        linearLayout.addView(TextView(requireContext()).also {
+                            it.text = "结束时间"
+                        })
+                        linearLayout.addView(datePickerButtonEnd)
+                        //提醒
+                        linearLayout.addView(TextView(requireContext()).also { it.text = "提醒" })
+                        linearLayout.addView(spinner)
+                        builder.setView(linearLayout)
+
+                        // 添加更多视图或逻辑，如选择提前时间的UI
+
+                        builder.setPositiveButton("确定") { dialog, which ->
+                            val title = editTextTitle.text.toString()
+                            val description = editTextDescription.text.toString()
+                            "$title + $description + $minutesBefore".makeToast()
+
+                            val fragment = this@EditorFragment
+                            XXPermissions.with(context)
+                                .requestWriteCalendar(fragment.requireContext())
+                                .requestReadCalendar(fragment.requireContext()) {
+                                    addEventToCalendar(
+                                        fragment.requireContext(),
+                                        editTextTitle.text.toString(),
+                                        editTextDescription.text.toString(),
+                                        editorViewModel.startCalendar.value!!, //需要dialog（inputEdit）设置用户设置描述
+                                        editorViewModel.endCalendar.value!! //需要dialog（下拉框）设置选择提前时间
+                                    )
+                                }
+                        }
+                        builder.setNegativeButton("取消", null)
+                        builder.show()
                     }
 
                     R.id.test_edit_menu_2 -> {
@@ -228,6 +336,32 @@ class EditorFragment : Fragment() {
                 binding.circleRefresh.isRefreshing = false
             }
         }
+    }
+
+    private fun showDatePickerDialog(choose: Int) {
+        val currentYear = Calendar.getInstance().get(Calendar.YEAR)
+        val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+        val currentDate = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
+        // 创建并显示DatePickerDialog
+        val datePickerDialog = DatePickerDialog(
+            requireContext(),
+            DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+                // 用户选择了日期后的回调 -- 异步回调出去
+                val res = Calendar.getInstance().apply {
+                    set(year, monthOfYear, dayOfMonth)
+                }
+                // 采用其他通信机制
+                // ViewModel中的LiveData、SharedFlow（如果使用Compose）、或者直接在OnDateSetListener中调用一个预先定义好的回调函数
+                when (choose) {
+                    1 -> editorViewModel.startCalendar.value = res
+                    2 -> editorViewModel.endCalendar.value = res
+                }
+            },
+            currentYear,
+            currentMonth,
+            currentDate
+        )
+        datePickerDialog.show()
     }
 
     private fun prepareMemoRecord(): MemoRecord {
@@ -269,7 +403,7 @@ class EditorFragment : Fragment() {
         }
 
         val memoRecord = prepareMemoRecord()
-        LogUtil.e("save","新笔记内容 newMemoRecord = $memoRecord")
+        LogUtil.e("save", "新笔记内容 newMemoRecord = $memoRecord")
         //2 保存 历史 - 在viewModel中
 
         //3 保存

@@ -1,4 +1,4 @@
-package com.illidancstormrage.cstormmemo.utils.extensions
+package com.illidancstormrage.test.untils
 
 import android.Manifest
 import android.content.Context

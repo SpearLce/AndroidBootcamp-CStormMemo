@@ -65,9 +65,7 @@ class ListFragment : Fragment() {
     private fun viewBinding() {
         memoListRecycleView = binding.memoListRecycleView
 
-        binding.includeMemo.memoCard.setOnClickListener {
 
-        }
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -78,7 +76,7 @@ class ListFragment : Fragment() {
 
         listViewModel.memoList.observe(viewLifecycleOwner) {
             LogUtil.e(TAG, "$TAG 列表memoList被触发更新 = $it")
-            adapter = MemoListAdapter(this, listViewModel.memoList.value!!)
+            adapter = MemoListAdapter(this, listViewModel.memoList.value!!,listViewModel)
             memoListRecycleView.adapter = adapter
             adapter.notifyDataSetChanged()
         }

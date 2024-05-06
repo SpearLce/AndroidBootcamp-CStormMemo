@@ -9,8 +9,9 @@
     android:layout_margin="12dp"
     app:cardCornerRadius="20dp"
     tools:ignore="HardcodedText"
-    app:cardBackgroundColor="#F4F4F4"
+    app:cardBackgroundColor="#FFF6C5"
     app:cardElevation="10dp"
+    tools:viewBindingIgnore="true"
     >
 
     <LinearLayout
@@ -27,7 +28,7 @@
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="20sp"
             android:textStyle="bold"
-            tools:text="第一条备忘录" />
+            android:text="Hi,欢迎来到storm备忘录" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -41,24 +42,7 @@
                 android:textColor="?android:attr/textColorSecondary"
                 android:textColorHint="?attr/colorPrimary"
                 android:textSize="14sp"
-                tools:text="12年1月3日 - 12:00" />
-            <TextView
-                android:layout_marginStart="10dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textColorHint="?attr/colorPrimary"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:text="分类: " />
-            <TextView
-                android:id="@+id/memo_tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?android:attr/textColorSecondary"
-                android:textColorHint="?attr/colorPrimary"
-                android:textSize="14sp"
-                tools:text="吃饭...[动态添加]" />
+                android:text="Storm: 记录生活，珍藏每一天的精彩瞬间" />
         </LinearLayout>
 
     </LinearLayout>

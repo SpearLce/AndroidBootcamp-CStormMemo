@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
+    <!--网络-->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!--录制-->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!--日历-->
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
+    <uses-permission android:name="android.permission.WRITE_CALENDAR"/>
 
     <application
         android:name=".CSMemoApplication"

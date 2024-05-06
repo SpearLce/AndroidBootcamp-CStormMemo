@@ -5,16 +5,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <include
-        android:id="@+id/include_memo"
-        layout="@layout/item_memo_list"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:id="@+id/include_welcome"
+        layout="@layout/card_welcom"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <!--通过adapter加载item.xml-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/memoList_recycleView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/include_memo"
+        app:layout_constraintTop_toBottomOf="@+id/include_welcome"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

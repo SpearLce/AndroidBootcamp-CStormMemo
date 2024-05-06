@@ -37,6 +37,10 @@ object LocalRepository {
         return memoDao.update(memoRecord)
     }
 
+    fun deleteOneMemoRecord(memoRecord: MemoRecord): Int {
+        return memoDao.delete(memoRecord)
+    }
+
     //audio
     fun getAllAudioList(): List<Audio> {
         return audioDao.selectAll()

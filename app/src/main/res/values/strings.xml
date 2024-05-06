@@ -11,4 +11,14 @@
         <item>选项2</item>
         <item>选项3</item>
     </string-array>
+
+
+    <string-array name="time_options">
+        <item>准时</item>
+        <item>5分钟前</item>
+        <item>15分钟前</item>
+        <item>30分钟前</item>
+        <item>1小时前</item>
+        <item>1天前</item>
+    </string-array>
 </resources>

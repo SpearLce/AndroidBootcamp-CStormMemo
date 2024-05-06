@@ -18,6 +18,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures{
+        viewBinding = true
+    }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -39,8 +42,10 @@ android {
 dependencies {
 
     implementation(project(":utils"))
+    //hutool
     implementation("cn.hutool:hutool-all:5.8.16")
-
+    //XXPermissions
+    implementation("com.github.getActivity:XXPermissions:16.0") //权限库
     //room
     val roomVersion = "2.5.2"
     //AndroidX Room 运行时库

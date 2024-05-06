@@ -1,6 +1,7 @@
 package com.illidancstormrage.cstormmemo.ui.editor
 
 import android.content.Context
+import android.icu.util.Calendar
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
@@ -50,6 +51,9 @@ class EditorViewModel : ViewModel() {
     val isTranslating = MutableLiveData<Boolean>(false) //正在语音转文字 - 刷新圈UI状态
     val audioText = MutableLiveData("")
 
+    //日期选择
+    val startCalendar = MutableLiveData<Calendar>()
+    val endCalendar = MutableLiveData<Calendar>()
 
     fun saveMemoToDb(newMemoRecord: MemoRecord) {
         LogUtil.d("save", "test ${DebugUtil.tag()}")
