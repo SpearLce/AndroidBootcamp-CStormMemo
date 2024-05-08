@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_list"
         >
         <action
-            android:id="@+id/jump_to_edit"
+            android:id="@+id/jump_to_edit_from_list"
             app:destination="@id/navigation_edit"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
@@ -38,5 +38,9 @@
         android:id="@+id/navigation_search"
         android:name="com.illidancstormrage.cstormmemo.ui.search.SearchFragment"
         android:label="@string/title_search"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/jump_to_edit_from_search"
+            app:destination="@id/navigation_edit" />
+    </fragment>
 </navigation>

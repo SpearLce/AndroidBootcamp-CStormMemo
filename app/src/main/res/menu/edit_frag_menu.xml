@@ -37,15 +37,15 @@
         android:icon="@drawable/baseline_memo_history_72"
         android:title="历史" />
     <item
-        android:id="@+id/test_edit_menu_1"
+        android:id="@+id/memo_reminder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:title="测试菜单1" />
-    <item
+        android:title="添加提醒" />
+    <!--<item
         android:id="@+id/test_edit_menu_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:title="测试菜单2"
         app:actionViewClass="android.widget.Button"
-        />
+        />-->
 </menu>

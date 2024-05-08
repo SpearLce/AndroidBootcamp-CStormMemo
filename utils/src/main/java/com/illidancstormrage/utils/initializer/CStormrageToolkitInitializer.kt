@@ -13,6 +13,8 @@ object CStormrageToolkitInitializer : UtilsInitializer {
      * * 解决方案：internal 限制模块内
      */
     internal var appContext: Context? = null
+
+
     var logLevel: Int = LogUtil.DEBUG
 
     override fun initializeContext(context: Context?) {

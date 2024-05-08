@@ -1,11 +1,14 @@
 package com.illidancstormrage.cstormmemo.repository
 
+import android.icu.util.Calendar
 import com.illidancstormrage.cstormmemo.CSMemoApplication.Companion.database
 import com.illidancstormrage.cstormmemo.model.audio.Audio
 import com.illidancstormrage.cstormmemo.model.category.Category
 import com.illidancstormrage.cstormmemo.model.history.History
 import com.illidancstormrage.cstormmemo.model.memo.MemoRecord
 import com.illidancstormrage.cstormmemo.model.memo.MemoWithHistories
+import com.illidancstormrage.cstormmemo.utils.calendar.dayEnd
+import com.illidancstormrage.cstormmemo.utils.calendar.dayStart
 import com.illidancstormrage.utils.database.room.condition.QueryWrapper
 
 object LocalRepository {
@@ -29,8 +32,27 @@ object LocalRepository {
         return memoDao.selectById(id)
     }
 
+    fun getOneMemoRecordByCategoryId(categoryId: Long): List<MemoRecord> {
+        val queryWrapper = QueryWrapper().like("category_id", categoryId)
+        return memoDao.selectList(queryWrapper)
+    }
+
     fun saveOneMemoRecord(memoRecord: MemoRecord): Long {
         return memoDao.insertIgnore(memoRecord)
+    }
+
+    fun getMemoListByTitleLike(title: String): List<MemoRecord> {
+        val queryWrapper = QueryWrapper().like("title", title)
+        return memoDao.selectList(queryWrapper)
+    }
+
+    fun getMemoListByDate(calendar: Calendar): List<MemoRecord> {
+        val dayStart = calendar.dayStart()
+        val dayEnd = calendar.dayEnd()
+        val queryWrapper = QueryWrapper()
+            .lt("lastEditTimeStamp", dayEnd)
+            .gt("lastEditTimeStamp", dayStart)
+        return memoDao.selectList(queryWrapper)
     }
 
     fun updateOneMemoRecord(memoRecord: MemoRecord): Int {
@@ -40,6 +62,7 @@ object LocalRepository {
     fun deleteOneMemoRecord(memoRecord: MemoRecord): Int {
         return memoDao.delete(memoRecord)
     }
+
 
     //audio
     fun getAllAudioList(): List<Audio> {

@@ -62,7 +62,7 @@ class MemoListAdapter(
 
             //更新 editor_fragment_viewModel中
             //val editorViewModel =
-            val action = ListFragmentDirections.jumpToEdit(memoRecordList[position].id)
+            val action = ListFragmentDirections.jumpToEditFromList(memoRecordList[position].id)
             it.findNavController().navigate(action)
         }
         //长按

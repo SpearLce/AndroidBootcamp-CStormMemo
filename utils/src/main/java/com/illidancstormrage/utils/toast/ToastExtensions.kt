@@ -2,6 +2,7 @@ package com.illidancstormrage.utils.toast
 
 import android.util.Log
 import android.widget.Toast
+import com.illidancstormrage.utils.constants.ToolsConstants.ERROR_TAG
 import com.illidancstormrage.utils.initializer.CStormrageToolkitInitializer
 import com.illidancstormrage.utils.log.LogUtil
 
@@ -29,7 +30,10 @@ fun String.makeToast(duration: Int = Toast.LENGTH_SHORT) {
             duration
         ).show()
     } catch (e: NullPointerException) {
-        LogUtil.e(tag = "error", msg = "检查工具库初始化，确保applicationContext非空")
+        LogUtil.e(
+            tag = ERROR_TAG, msg = "检查工具库初始化，确保applicationContext非空" + "\n是否为非UI线程"
+                    + "\n${e.message}"
+        )
     }
 
 }

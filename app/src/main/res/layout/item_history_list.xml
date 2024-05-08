@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/memo_card"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="80dp"
     android:layout_margin="12dp"
     app:cardCornerRadius="4dp"
     tools:ignore="HardcodedText">
@@ -21,7 +21,8 @@
             android:layout_height="wrap_content"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="18sp"
-            tools:text="12年1月3日" />
+            android:maxLines="2"
+            tools:text="12年1月3日 -月3日 - 12年1月3日" />
 
         <LinearLayout
             android:layout_width="wrap_content"

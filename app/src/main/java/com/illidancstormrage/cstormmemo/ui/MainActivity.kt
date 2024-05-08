@@ -135,6 +135,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+    }
+
     private fun testInsert() {
         "testInsert".makeToast()
         val memoRecord = MemoRecord(

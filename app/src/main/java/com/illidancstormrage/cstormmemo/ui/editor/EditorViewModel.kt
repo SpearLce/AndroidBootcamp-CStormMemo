@@ -20,8 +20,11 @@ import com.illidancstormrage.cstormmemo.repository.LocalRepository
 import com.illidancstormrage.cstormmemo.repository.RemoteRepository
 import com.illidancstormrage.cstormmemo.repository.RemoteRepository.getAudioToTextResult
 import com.illidancstormrage.cstormmemo.ui.record.exception.OrderInvalidException
+import com.illidancstormrage.cstormmemo.utils.coroutines.launchAtIo
+import com.illidancstormrage.cstormmemo.utils.coroutines.launchAtMain
 import com.illidancstormrage.cstormmemo.utils.debug.DebugUtil
 import com.illidancstormrage.cstormmemo.utils.debug.tag
+import com.illidancstormrage.cstormmemo.utils.extensions.msToHMSFormatArr
 import com.illidancstormrage.cstormmemo.utils.file.FileUtil
 import com.illidancstormrage.cstormmemo.utils.file.FileUtil.isFileExistsAtUri
 import com.illidancstormrage.cstormmemo.utils.network.RetrofitCreator
@@ -107,6 +110,7 @@ class EditorViewModel : ViewModel() {
                     LogUtil.e("save", "saveMemo 更新后，更新影响行数，resRow = $resRow")
                     memoRecord.postValue(newMemoRecord)
                 }
+
                 false -> {
                     LogUtil.e("save", "saveMemo 保存 到数据库前，新纪录，${newMemoRecord}")
                     val memoId = LocalRepository.saveOneMemoRecord(newMemoRecord)
@@ -165,36 +169,45 @@ class EditorViewModel : ViewModel() {
         }
     }
 
-    fun setUri(uri: String) {
-        audio.value?.uri = uri
-        audio.value = audio.value //触发更新 player
-        viewModelScope.launch(Dispatchers.IO) {
-            // 保存
+    fun setUri(newUri: String) {
+        val oldUri = audio.value?.uri
+        LogUtil.e(TAG,"oldUri = $oldUri")
+        LogUtil.e(TAG,"newUri = $newUri")
 
-            //先查id
-            if (audio.value!!.id <= 0) {
-                // 先查有没有
-                val audioResult = LocalRepository.getOneAudioByUri(uri)
-                LogUtil.e(EditorFragment.TAG, "setUri - audioResult =  $audioResult")
+        if (oldUri == null || oldUri == newUri) {
+            audio.value?.uri = newUri
+            audio.value = audio.value //触发更新 player
+            viewModelScope.launch(Dispatchers.IO) {
+                //先查id
+                if (audio.value!!.id <= 0) {
+                    // 先查有没有
+                    val audioResult = LocalRepository.getOneAudioByUri(newUri)
 
-
-                if (audioResult != null) { //查到 uri 所在 id
-                    //有：更新id
-                    audio.value?.id = audioResult.id
-                } else { //没有查到id 且 没有 id
+                    if (audioResult != null) { //查到 newUri 所在 id
+                        //有：更新id
+                        audio.value?.id = audioResult.id
+                    } else { //没有查到id 且 没有 id
+                        audio.value?.let {
+                            //无：保存uri - 即音频
+                            val resId = LocalRepository.saveOneAudio(it)
+                            audio.value!!.id = resId
+                        }
+                    }
+                } else {
+                    //有 id 就更新 newUri
                     audio.value?.let {
-                        //无：保存uri - 即音频
                         val resId = LocalRepository.saveOneAudio(it)
-                        audio.value!!.id = resId
                     }
                 }
-            } else {
-                //有 id 就更新 uri
+            }
+        } else { //if (oldUri != newUri)
+            audio.value?.uri = newUri
+            audio.value = audio.value //触发更新 player
+            viewModelScope.launch(Dispatchers.IO) {
                 audio.value?.let {
                     val resId = LocalRepository.saveOneAudio(it)
                 }
             }
-
         }
     }
 
@@ -348,7 +361,7 @@ class EditorViewModel : ViewModel() {
     )
 
     //轮询有效订单的结果
-    private suspend fun pollAudioOrderResults(orderId: String, taskEstimateTime: Long) {
+    suspend fun pollAudioOrderResults(orderId: String, taskEstimateTime: Long) {
         // 一定时间，得到结果
         // 轮询结果 - 超出次数(总100) / 预估时间 - 如果是0，轮询次数改为1 （轮询次数）
         var pollingCount = 1 //只是粗略每次查询100次(查询次数递减)
@@ -356,6 +369,8 @@ class EditorViewModel : ViewModel() {
         //先预算一下预估时间，再根据预估时间调整间距询问。
         // taskEstimateTime -> ms
         var taskEstimateTimeLeft = taskEstimateTime
+
+
         var stop = false
 
         while (pollingCount <= 50 && !stop) {
@@ -364,7 +379,22 @@ class EditorViewModel : ViewModel() {
             //轮询间隔 - 第一次是预估时间 - 二分递减
             //delay(calculateInterval(taskEstimateTime, pollingCount))
 
+            //弹出预估时间
+            val arrayTimeParts = taskEstimateTimeLeft.msToHMSFormatArr()
+            LogUtil.e(
+                TAG, "== 轮询[$pollingCount] -> 预估时间arrayTimeParts " +
+                        "= 预估时间${arrayTimeParts[0]}:${arrayTimeParts[1]}:${arrayTimeParts[2]}"
+            )
+            if (arrayTimeParts[2] >= 4) {
+                viewModelScope.launchAtMain {
+                    "预估时间${arrayTimeParts[0]}:${arrayTimeParts[1]}:${arrayTimeParts[2]}".makeToast(
+                        Toast.LENGTH_LONG
+                    )
+                }
+            }
+
             delay(taskEstimateTimeLeft)
+
 
             val audioToTextResult = getAudioToTextResult(
                 DateUtil.date().time.toString(),
@@ -500,11 +530,10 @@ class EditorViewModel : ViewModel() {
 
             pollingCount++
 
-            if (taskEstimateTime == 0L) {
+            if (taskEstimateTime <= 0L) {
                 break //0ms 说明上述代码已经处理完，防止轮询多度导致服务器阻塞
             }
         }
-
 
         //-------------------
 

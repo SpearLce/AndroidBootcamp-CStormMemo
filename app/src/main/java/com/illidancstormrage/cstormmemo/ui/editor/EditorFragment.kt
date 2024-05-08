@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
@@ -43,12 +44,15 @@ import com.illidancstormrage.cstormmemo.ui.SharedViewModel
 import com.illidancstormrage.cstormmemo.ui.editor.dialog.HistoryDialogFragment
 import com.illidancstormrage.cstormmemo.ui.record.AudioRecordActivity
 import com.illidancstormrage.cstormmemo.utils.calendar.CalendarUtil.addEventToCalendar
+import com.illidancstormrage.cstormmemo.utils.coroutines.launchAtIo
 import com.illidancstormrage.cstormmemo.utils.extensions.pass
 import com.illidancstormrage.cstormmemo.utils.extensions.requestReadCalendar
 import com.illidancstormrage.cstormmemo.utils.extensions.requestWriteCalendar
 import com.illidancstormrage.cstormmemo.utils.file.FileUtil
 import com.illidancstormrage.utils.log.LogUtil
 import com.illidancstormrage.utils.toast.makeToast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 
 
@@ -196,7 +200,7 @@ class EditorFragment : Fragment() {
 
                     }
 
-                    R.id.test_edit_menu_1 -> {
+                    R.id.memo_reminder -> {
 
                         val builder = AlertDialog.Builder(requireContext())
                         builder.setTitle("添加提醒")
@@ -313,13 +317,14 @@ class EditorFragment : Fragment() {
                         builder.show()
                     }
 
-                    R.id.test_edit_menu_2 -> {
+                    /*R.id.test_edit_menu_2 -> {
                         editorViewModel.isTranslating.value = true
-                    }
+                    }*/
 
                     android.R.id.home -> {
-                        "触发home返回键".makeToast()
-
+                        lifecycleScope.launchAtIo {
+                            editorViewModel.pollAudioOrderResults("123",37536)
+                        }
                     }
                 }
                 return true
@@ -378,6 +383,9 @@ class EditorFragment : Fragment() {
         } else { //audio不存在
             null
         }
+
+
+
         //1 保存 memo
         val memoRecord = MemoRecord(
             title = binding.title.text.toString(),
@@ -393,6 +401,9 @@ class EditorFragment : Fragment() {
             audioId = audioId, //为0设置null
             //id = 0L //viewModel中判断
         )
+
+        LogUtil.e("a","memoRecord = $memoRecord")
+
         return memoRecord
     }
 

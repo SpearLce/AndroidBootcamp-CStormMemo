@@ -182,7 +182,7 @@ abstract class BaseDao<T : Any> {
     abstract fun queryOne(query: SupportSQLiteQuery): T
 
     @RawQuery
-    abstract fun queryOneTest(query: SupportSQLiteQuery): T? //?写不写，如果返回没有就是空
+    abstract fun queryOneTest(query: SupportSQLiteQuery): T? //?可写可不写，如果返回没有就是空
 
     @RawQuery
     abstract fun queryList(query: SupportSQLiteQuery): List<T>

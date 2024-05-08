@@ -40,7 +40,7 @@ class HistoryListAdapter(
             binding.okHistory.setOnClickListener {
                 historyViewModel.selectHistory(history)
             }
-            binding.timeHistory.text = history.editTime.msFormatDateStr()
+            binding.timeHistory.text = history.editTime.msFormatDateStr("yyyy/MM/dd HH:mm")
 
         }
     }
