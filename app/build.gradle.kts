@@ -2,7 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt") //启用注解器kapt
-    id("androidx.navigation.safeargs.kotlin")
+    id("androidx.navigation.safeargs.kotlin") //navigation 插件 - 这是kts代替classpath写法
     kotlin("plugin.serialization") //启用全局项目配置 序列化插件
 }
 
